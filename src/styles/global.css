@@ -109,3 +109,5 @@
   .contact-card .contact-copy>span:first-child{font-size:.73rem}
   .contact-card .contact-copy>span:last-child{font-size:.76rem}
 }
+
+.art-detection-visual{width:100%;max-width:360px;height:auto;color:var(--olive)}
