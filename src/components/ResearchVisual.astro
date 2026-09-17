@@ -1,0 +1,42 @@
+---
+interface Props { type: string }
+const { type } = Astro.props;
+---
+<svg class:list={['research-visual', type]} viewBox="0 0 240 180" fill="none" aria-hidden="true" stroke-linecap="round" stroke-linejoin="round">
+  {type === 'network' && <>
+    <g stroke="currentColor" stroke-width="1.4">
+      <circle cx="22" cy="40" r="6"/><circle cx="22" cy="64" r="6"/>
+      <path d="M29 40h19m-19 24h19M60 27h-7v50h7m153-50h7v50h-7M60 113h-7v50h7m153-50h7v50h-7"/>
+      <path d="m94 31 18 17m-18 0 18-17m36 24 18 17m-18 0 18-17M94 55l18 17m-18 0 18-17"/>
+      <path d="M133 84v20m-5-5 5 5 5-5"/>
+    </g>
+    <g fill="currentColor" font-family="monospace" font-size="14" text-anchor="middle">
+      <text x="76" y="45">.7</text><text x="103" y="45">.2</text><text x="157" y="45">.9</text><text x="194" y="45">.4</text>
+      <text x="76" y="69">.3</text><text x="103" y="69">.8</text><text x="157" y="69">.1</text><text x="194" y="69">.6</text>
+      <text x="76" y="131">.7</text><text x="103" y="131">0</text><text x="157" y="131">.9</text><text x="194" y="131">.4</text>
+      <text x="76" y="155">.3</text><text x="103" y="155">0</text><text x="157" y="155">0</text><text x="194" y="155">.6</text>
+    </g>
+  </>}
+  {type === 'paths' && <>
+    <g stroke="currentColor" stroke-width="1.4">
+      <path d="M18 67h204M18 153h204" opacity=".5"/>
+      <path d="M20 65C43 65 47 25 78 25S119 65 145 65 180 43 199 49 213 62 222 65"/>
+      <path d="M20 151C70 151 115 151 135 140S154 104 179 102 204 145 222 151"/>
+      <path d="M67 78q29 23 88 53m-8-1 8 1-3-8M116 78q24 18 55 46m-8-1 8 1-2-8M187 78v41m-5-5 5 5 5-5" stroke-dasharray="3 4"/>
+    </g>
+    <g fill="currentColor">
+      <circle cx="52" cy="67" r="2.8"/><circle cx="67" cy="67" r="2.8"/><circle cx="78" cy="67" r="2.8"/><circle cx="94" cy="67" r="2.8"/><circle cx="116" cy="67" r="2.8"/><circle cx="187" cy="67" r="2.8"/>
+      <circle cx="148" cy="153" r="2.8"/><circle cx="164" cy="153" r="2.8"/><circle cx="175" cy="153" r="2.8"/><circle cx="184" cy="153" r="2.8"/><circle cx="194" cy="153" r="2.8"/><circle cx="205" cy="153" r="2.8"/>
+      <text x="18" y="16" font-size="11" font-family="monospace">base</text><text x="18" y="107" font-size="11" font-family="monospace">≈ target</text>
+    </g>
+  </>}
+  {type === 'contours' && <>
+    <g stroke="currentColor" stroke-width="1.5">
+      <path d="M12 45C30 49 31 108 62 111C85 113 96 72 112 48C128 73 134 155 175 153S213 82 229 69" stroke-linejoin="miter"/>
+      <path d="M62 97C80 4 136 9 170 131" stroke-dasharray="4 5"/>
+      <path d="m162 125 8 6 2-11"/>
+      <circle cx="62" cy="101" r="8" fill="currentColor"/>
+      <circle cx="175" cy="143" r="8" stroke-dasharray="2 3"/>
+    </g>
+  </>}
+</svg>

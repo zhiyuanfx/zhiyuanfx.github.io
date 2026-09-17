@@ -1,0 +1,90 @@
+---
+import { getPosts, formatDate } from '../lib/posts';
+import { searchPosts } from '../lib/search.mjs';
+const posts = await getPosts();
+---
+<div class="note-controls">
+  <label class="search-label"><span class="sr-only">Search note titles, keywords, and content</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></svg><input id="note-search" type="search" placeholder="Search notes, ideas, keywords…" autocomplete="off" /></label>
+  <button id="note-sort" class="sort-toggle" type="button" data-order="desc" aria-label="Sort by date: latest first. Switch to oldest first" title="Sort by" aria-pressed="false"><svg viewBox="0 0 32 28" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><g class="sort-up"><path d="M9 23V5m-5 5 5-5 5 5"/></g><g class="sort-down"><path d="M23 5v18m-5-5 5 5 5-5"/></g></svg></button>
+</div>
+<p id="note-status" class="note-status" aria-live="polite" aria-atomic="true">{posts.length} notes</p>
+<div id="note-list">
+  {searchPosts(posts).map((post) => <article class="note-card linked-card"><div class="note-copy"><h3><a class="card-link" data-note-link href={post.url}>{post.title}</a></h3><div class="note-date"><time datetime={post.date}>{formatDate(post.date)}</time></div><p class="note-excerpt">{post.excerpt}</p><div class="tags">{post.keywords.map((keyword: string) => <span>{keyword}</span>)}</div></div></article>)}
+</div>
+<p id="note-empty" class="empty-state" hidden>No notes match your search. Try another word or clear the search.</p>
+<noscript><p class="muted">All notes are listed newest first. Enable JavaScript to search and change their order.</p></noscript>
+<script is:inline id="note-index" type="application/json" set:html={JSON.stringify(posts).replace(/</g, '\\u003c')} />
+<script>
+  import { searchPosts, occurrences } from '../lib/search.mjs';
+  const data = JSON.parse(document.querySelector('#note-index')!.textContent!);
+  const input = document.querySelector<HTMLInputElement>('#note-search')!;
+  const sort = document.querySelector<HTMLButtonElement>('#note-sort')!;
+  const list = document.querySelector<HTMLElement>('#note-list')!;
+  const status = document.querySelector<HTMLElement>('#note-status')!;
+  const empty = document.querySelector<HTMLElement>('#note-empty')!;
+  let order = 'desc';
+  function element(tag: string, className: string, text?: string) {
+    const node = document.createElement(tag);
+    node.className = className;
+    if (text) node.textContent = text;
+    return node;
+  }
+  function highlight(node: HTMLElement, value: string, query: string) {
+    let cursor = 0;
+    for (const position of occurrences(value, query)) {
+      node.append(document.createTextNode(value.slice(cursor, position)));
+      node.append(element('mark', '', value.slice(position, position + query.length)));
+      cursor = position + query.length;
+    }
+    node.append(document.createTextNode(value.slice(cursor)));
+  }
+  function render(updateUrl = true) {
+    const query = input.value.trim();
+    const results = searchPosts(data, query, order);
+    sort.dataset.order = order;
+    sort.setAttribute('aria-pressed', String(order === 'asc'));
+    sort.setAttribute('aria-label', `Sort by date: ${order === 'asc' ? 'oldest first. Switch to latest first' : 'latest first. Switch to oldest first'}`);
+    if (updateUrl) {
+      const url = new URL(location.href);
+      if (query) url.searchParams.set('q', query); else url.searchParams.delete('q');
+      if (order === 'asc') url.searchParams.set('sort', 'asc'); else url.searchParams.delete('sort');
+      history.replaceState(history.state, '', url);
+    }
+    const fragment = document.createDocumentFragment();
+    for (const post of results) {
+      const card = element('article', 'note-card linked-card');
+      const date = element('div', 'note-date');
+      const time = document.createElement('time');
+      time.dateTime = post.date;
+      time.textContent = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' }).format(new Date(post.date));
+      date.append(time);
+      const copy = element('div', 'note-copy');
+      const tags = element('div', 'tags');
+      post.keywords.forEach((keyword: string) => { const tag = element('span', ''); highlight(tag, keyword, query); tags.append(tag); });
+      const heading = element('h3', '');
+      const link = document.createElement('a');
+      link.className = 'card-link';
+      link.dataset.noteLink = '';
+      const target = new URL(post.url, location.origin);
+      if (query) target.searchParams.set('q', query);
+      if (order === 'asc') target.searchParams.set('sort', 'asc');
+      link.href = target.pathname + target.search;
+      highlight(link, post.title, query);
+      heading.append(link);
+      const preview = element('p', 'note-excerpt'); highlight(preview, post.excerpt, query);
+      copy.append(heading, date, preview);
+      if (query) copy.append(element('p', 'match-count', `${post.count} occurrence${post.count === 1 ? '' : 's'}`));
+      copy.append(tags);
+      card.append(copy); fragment.append(card);
+    }
+    list.replaceChildren(fragment);
+    empty.hidden = results.length !== 0;
+    status.textContent = query ? `${results.length} note${results.length === 1 ? '' : 's'} matching “${query}”` : `${data.length} notes`;
+  }
+  function restore() { const params = new URLSearchParams(location.search); input.value = params.get('q') || ''; order = params.get('sort') === 'asc' ? 'asc' : 'desc'; render(false); }
+  input.addEventListener('input', () => render());
+  sort.addEventListener('click', () => { order = order === 'desc' ? 'asc' : 'desc'; render(); });
+  window.addEventListener('popstate', restore);
+  window.addEventListener('pageshow', restore);
+  restore();
+</script>

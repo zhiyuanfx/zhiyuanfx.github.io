@@ -1,0 +1,7 @@
+---
+export function getStaticPaths() {
+  return ['notes-on-guided-sampling', 'notes-on-optimization'].map(id => ({ params: { id } }));
+}
+const destination = `/notes/${Astro.params.id}/`;
+---
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta http-equiv="refresh" content={`0;url=${destination}`}/><link rel="canonical" href={new URL(destination, Astro.site)}/><title>Note moved</title></head><body><a href={destination}>Continue to the note</a></body></html>

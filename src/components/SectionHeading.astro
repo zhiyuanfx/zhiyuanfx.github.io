@@ -1,0 +1,15 @@
+---
+import { Image } from 'astro:assets';
+import research from '../assets/my_icons/capybara-lulu-pencil-research.png';
+import projects from '../assets/my_icons/capybara-lulu-pencil-projects.png';
+import experience from '../assets/my_icons/capybara-lulu-pencil-experience.png';
+import publications from '../assets/my_icons/capybara-lulu-pencil-publications.png';
+import notes from '../assets/my_icons/capybara-lulu-pencil-notes.png';
+const icons = { Research: research, Projects: projects, Experience: experience, Publications: publications, Notes: notes };
+interface Props { id: string; number: string; title: keyof typeof icons }
+const { id, number, title } = Astro.props;
+---
+<div class="section-heading numbered-heading">
+  <h2 id={id}><span class="section-number">{number} /</span> {title}</h2>
+  <Image class="section-icon" src={icons[title]} width={160} alt="" aria-hidden="true" />
+</div>

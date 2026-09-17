@@ -1,17 +1,71 @@
 ---
-
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import SiteLayout from '../layouts/SiteLayout.astro';
+import ResearchVisual from '../components/ResearchVisual.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ContactIcon from '../components/ContactIcon.astro';
+import NotesList from '../components/NotesList.astro';
+import portrait from '../assets/images/portrait-source.png';
+import resume from '../assets/resume/JiaZhiyuan.pdf';
+import { profile, news, research, projects, experience, education, publications, noteUrl } from '../data/profile';
+const noteIds = new Set((await getCollection('notes')).map(note => note.id));
+for (const item of [...research, ...projects, ...experience, ...publications]) {
+  if (!noteIds.has(item.noteId)) throw new Error(`Missing linked note: ${item.noteId}`);
+}
 ---
-
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<SiteLayout>
+  <div class="shell">
+    <section id="about" data-section aria-labelledby="about-heading">
+      <div class="hero">
+        <figure class="portrait-frame"><Image src={portrait} alt="Portrait of Zhiyuan Jia" widths={[320, 480, 640, 960]} sizes="(max-width: 700px) 75vw, (max-width: 1100px) 32vw, 300px" width={600} height={800} loading="eager" fetchpriority="high" /></figure>
+        <div class="intro">
+          <p class="eyebrow">CS, Applied Math, Industrial Engineering</p>
+          <h1 id="about-heading">Zhiyuan Jia<span class="brand-dot">.</span></h1>
+          <p class="bio">{profile.bio}</p>
+          <div class="hero-actions">
+            <div class="affiliation"><span class="uw-letter" aria-hidden="true">W</span><div><strong>University of Washington</strong><span>Industrial &amp; Systems Engineering</span></div></div>
+            <a class="button" href={resume} download="Zhiyuan-Jia-Resume.pdf"><span aria-hidden="true">↓</span> Download résumé</a>
+          </div>
+        </div>
+        <aside class="contact-card" aria-labelledby="contact-heading">
+          <h2 id="contact-heading">Contact</h2>
+          <a href={`mailto:${profile.email}`}><ContactIcon kind="email"/><span class="contact-copy"><span>Email</span><span>{profile.email} ↗</span></span></a>
+          <a href={profile.linkedin} target="_blank" rel="noreferrer"><ContactIcon kind="linkedin"/><span class="contact-copy"><span>LinkedIn</span><span>Find me there ↗</span></span></a>
+          <a href={profile.github} target="_blank" rel="noreferrer"><ContactIcon kind="github"/><span class="contact-copy"><span>GitHub</span><span>@zhiyuanfx ↗</span></span></a>
+        </aside>
+      </div>
+      <div class="news"><h2>Latest news</h2><div class="news-list">{news.map((item) => <article><time datetime={item.date}>{item.label}</time><p>{item.href ? <a href={item.href}>{item.text} <span aria-hidden="true">↗</span></a> : item.text}</p></article>)}</div></div>
+      <div class="selected-work"><div class="section-heading"><h2>Selected work</h2><a class="text-link" href="#research">More work <span aria-hidden="true">→</span></a></div><div class="work-grid">{research.map((item) => <a class="work-card" href={`#${item.id}`}><p class="eyebrow">{item.tag}</p><h3>{item.title}</h3><p>{item.short}</p><span class="work-arrow" aria-hidden="true">→</span><ResearchVisual type={item.visual} /></a>)}</div></div>
+    </section>
+    <section id="research" data-section class="content-section" aria-labelledby="research-heading">
+      <SectionHeading id="research-heading" number="01" title="Research" />
+      <div class="research-list">{research.map((item) => <article id={item.id} class="research-row linked-card reveal">
+        <div class="research-art"><ResearchVisual type={item.visual} /></div>
+        <div><h3><a class="card-link" data-note-link href={noteUrl(item.noteId)}>{item.title}</a></h3><p>{item.description}</p>
+          <div class="tags research-tags">{item.keywords.map((keyword) => <span>{keyword}</span>)}{item.metrics.map((metric) => <span class="result-tag">{metric}</span>)}</div>
+        </div>
+      </article>)}</div>
+    </section>
+    <section id="projects" data-section class="content-section" aria-labelledby="projects-heading">
+      <SectionHeading id="projects-heading" number="02" title="Projects" />
+      {projects.map((project) => <article class="project-card linked-card reveal">
+        <div class="project-illustration" aria-hidden="true"><div class="art-grid"><i></i><i></i><i></i><i></i></div><div class="model-comparison"><span>ResNet-50</span><span>↔</span><span>ViT-B/16</span></div><p>HUMAN / GENERATED</p></div>
+        <div class="project-copy"><h3><a class="card-link" data-note-link href={noteUrl(project.noteId)}>{project.title}</a></h3><p class="project-subtitle">{project.subtitle}</p><p>{project.description}</p><p>{project.detail}</p><div class="tags">{[...project.keywords, ...project.technologies].map((keyword) => <span>{keyword}</span>)}</div></div>
+      </article>)}
+    </section>
+    <section id="experience" data-section class="content-section" aria-labelledby="experience-heading">
+      <SectionHeading id="experience-heading" number="03" title="Experience" />
+      <div class="timeline">{experience.map((item) => <article class="timeline-row linked-card reveal"><p class="timeline-date">{item.date}</p><div><p class="eyebrow">{item.organization}</p><h3><a class="card-link" data-note-link href={noteUrl(item.noteId)} aria-label={`${item.role}: ${item.organization}, ${item.date}`}>{item.role}</a></h3><p class="collaborators">{item.people}</p><p>{item.text}</p></div></article>)}</div>
+      <div class="education reveal"><h3>Education</h3><div>{education.map((item) => <article><p class="timeline-date">{item.date}</p><h4>{item.title}</h4><p>{item.detail}</p></article>)}</div></div>
+    </section>
+    <section id="publications" data-section class="content-section" aria-labelledby="publications-heading">
+      <SectionHeading id="publications-heading" number="04" title="Publications" />
+      {publications.map((publication, index) => <article class="publication linked-card reveal"><div class="publication-meta"><span class="publication-number" aria-label={`Paper ${index + 1}`}>[{index + 1}]</span><span class="publication-year">{publication.year}</span></div><div><h3><a class="card-link" data-note-link href={noteUrl(publication.noteId)}>{publication.title}</a></h3><p>{publication.authors}</p><p class="publication-status">{publication.status}</p><div class="tags">{publication.keywords.map(keyword => <span>{keyword}</span>)}<a class="tag-link" href={publication.href} target="_blank" rel="noreferrer">Read on arXiv <span aria-hidden="true">↗</span></a></div></div></article>)}
+    </section>
+    <section id="notes" data-section class="content-section notes-section" aria-labelledby="notes-heading">
+      <SectionHeading id="notes-heading" number="05" title="Notes" />
+      <NotesList />
+    </section>
+  </div>
+</SiteLayout>

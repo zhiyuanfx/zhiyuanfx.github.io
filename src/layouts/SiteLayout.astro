@@ -1,0 +1,81 @@
+---
+import { Image } from 'astro:assets';
+import goodbye from '../assets/my_icons/capybara-lulu-pencil-goodbye.png';
+import icon from '../assets/my_icons/capybara-lulu-pencil-computer.png';
+import { profile, sections } from '../data/profile';
+import '../styles/global.css';
+import { formatDate } from '../lib/posts';
+interface Props { title?: string; description?: string; article?: boolean }
+const { title = profile.name, description = profile.bio, article = false } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <script is:inline>
+      if (location.pathname === '/' && (new URLSearchParams(location.search).has('restore') || history.state?.notePosition)) document.documentElement.classList.add('restoring-position');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#f3efe6" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={article ? 'article' : 'website'} />
+    <meta property="og:url" content={canonical} />
+    <title>{title === profile.name ? `${title} — Research & Notes` : `${title} — ${profile.name}`}</title>
+  </head>
+  <body data-article={article}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+      <div class="header-inner">
+        <a class="brand" href="/#about" aria-label="Zhiyuan Jia, home"><Image src={icon} width={48} height={50} alt="" /><span>Zhiyuan Jia<span class="brand-dot">.</span></span></a>
+        <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">Menu <span aria-hidden="true">☰</span></button>
+        <nav id="primary-nav" aria-label="Primary navigation">
+          {sections.map((section) => <a href={`${article ? '/' : ''}#${section.toLowerCase()}`} data-section={section.toLowerCase()} aria-current={article && section === 'Notes' ? 'page' : undefined}>{section}</a>)}
+        </nav>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer shell">
+      <a class="footer-icon" href="/#about" aria-label="Zhiyuan Jia, home"><Image src={goodbye} width={156} alt="Capybara waving goodbye" /></a>
+      <p class="footer-message">Thoughtfully Exploring Intelligence &amp; Optimization</p>
+      <p class="last-updated">Last Updated <time datetime={profile.lastUpdated}>{formatDate(profile.lastUpdated)}</time></p>
+    </footer>
+    <script>
+      import { setupNoteNavigation } from '../lib/note-navigation';
+      setupNoteNavigation();
+      const menu = document.querySelector<HTMLButtonElement>('.menu-toggle')!;
+      const nav = document.querySelector<HTMLElement>('#primary-nav')!;
+      document.documentElement.classList.add('js');
+      function closeMenu() { menu.setAttribute('aria-expanded', 'false'); nav.classList.remove('is-open'); }
+      menu.addEventListener('click', () => {
+        const open = menu.getAttribute('aria-expanded') !== 'true';
+        menu.setAttribute('aria-expanded', String(open));
+        nav.classList.toggle('is-open', open);
+      });
+      nav.addEventListener('click', (event) => { if ((event.target as HTMLElement).closest('a')) closeMenu(); });
+      document.addEventListener('keydown', (event) => { if (event.key === 'Escape' && menu.getAttribute('aria-expanded') === 'true') { closeMenu(); menu.focus(); } });
+      document.addEventListener('click', (event) => { if (!(event.target as HTMLElement).closest('.site-header')) closeMenu(); });
+      const sections = [...document.querySelectorAll<HTMLElement>('section[data-section]')];
+      if (sections.length) {
+        let ticking = false;
+        function updateActive() {
+          const active = [...sections].reverse().find((section) => section.getBoundingClientRect().top <= 150) || sections[0];
+          nav.querySelectorAll('a').forEach((link) => { if (link.dataset.section === active.id) link.setAttribute('aria-current', 'location'); else link.removeAttribute('aria-current'); });
+          ticking = false;
+        }
+        window.addEventListener('scroll', () => { if (!ticking) { requestAnimationFrame(updateActive); ticking = true; } }, { passive: true });
+        updateActive();
+      }
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('entered'); observer.unobserve(entry.target); } });
+        }, { threshold: 0.08 });
+        document.querySelectorAll('.reveal').forEach((element) => { element.classList.add('will-reveal'); observer.observe(element); });
+      }
+    </script>
+  </body>
+</html>
