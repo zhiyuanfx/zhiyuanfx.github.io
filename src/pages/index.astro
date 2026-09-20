@@ -23,16 +23,12 @@ for (const item of [...research, ...projects, ...experience, ...publications]) {
         <div class="intro">
           <h1 id="about-heading">Zhiyuan Jia<span class="brand-dot">.</span></h1>
           <p class="bio">{profile.bio}</p>
-          <div class="hero-actions">
-            <div class="affiliation"><span class="uw-letter" aria-hidden="true">W</span><div><strong>University of Washington</strong><span>Industrial &amp; Systems Engineering</span></div></div>
-            <a class="button" href={resume} download="Zhiyuan-Jia-Resume.pdf"><span aria-hidden="true">↓</span> Download résumé</a>
-          </div>
         </div>
-        <aside class="contact-card" aria-labelledby="contact-heading">
-          <h2 id="contact-heading">Contact</h2>
+        <aside class="contact-card" aria-label="Contact and résumé">
           <a href={`mailto:${profile.email}`}><ContactIcon kind="email"/><span class="contact-copy"><span>Email</span><span>{profile.email} ↗</span></span></a>
-          <a href={profile.linkedin} target="_blank" rel="noreferrer"><ContactIcon kind="linkedin"/><span class="contact-copy"><span>LinkedIn</span><span>Find me there ↗</span></span></a>
           <a href={profile.github} target="_blank" rel="noreferrer"><ContactIcon kind="github"/><span class="contact-copy"><span>GitHub</span><span>@zhiyuanfx ↗</span></span></a>
+          <a href={profile.linkedin} target="_blank" rel="noreferrer"><ContactIcon kind="linkedin"/><span class="contact-copy"><span>LinkedIn</span><span>Find me there ↗</span></span></a>
+          <a class="button" href={resume} download="Zhiyuan-Jia-Resume.pdf"><ContactIcon kind="resume"/><span class="contact-copy"><span>Resume</span><span>Download ↓</span></span></a>
         </aside>
       </div>
       <div class="news"><h2>Latest news</h2><div class="news-list">{news.map((item) => <article><time datetime={item.date}>{item.label}</time><p>{item.href ? <a href={item.href}>{item.text} <span aria-hidden="true">↗</span></a> : item.text}</p></article>)}</div></div>

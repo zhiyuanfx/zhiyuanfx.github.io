@@ -65,7 +65,7 @@ test('keyboard navigation, reduced motion, and all local resources', async ({ pa
     await image.scrollIntoViewIfNeeded();
     await expect.poll(() => image.evaluate(n => (n as HTMLImageElement).complete && (n as HTMLImageElement).naturalWidth > 0)).toBe(true);
   }
-  const resume = await page.getByRole('link', { name: 'Download résumé' }).getAttribute('href');
+  const resume = await page.getByRole('link', { name: 'Resume Download ↓' }).getAttribute('href');
   expect((await request.get(resume!)).status()).toBe(200);
   expect((await request.get('/favicon.png')).status()).toBe(200);
   await expect(page.locator('.contact-card a[href*="linkedin.com/in/zhiyuan-jia-241533295"]')).toHaveCount(1);
