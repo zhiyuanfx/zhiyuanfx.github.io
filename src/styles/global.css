@@ -195,3 +195,10 @@
 @media(min-width:640px) and (max-width:760px){
   .contact-card{grid-template-columns:repeat(4,minmax(0,1fr))}
 }
+
+/* Give contact links the résumé button's hover feedback without moving their layout. */
+.contact-card>a:not(.button){transition:background .2s,border-color .2s,transform .2s}
+.contact-card>a:not(.button):is(:hover,:focus-visible){background:color-mix(in srgb,var(--paper) 94%,var(--ink));border-color:var(--line);transform:translateY(-2px)}
+@media(prefers-reduced-motion:reduce){
+  .contact-card>a:is(:hover,:focus-visible){transform:none}
+}
