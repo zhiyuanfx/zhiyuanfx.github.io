@@ -90,7 +90,7 @@ test('annotations: compact headings, contact, monthly news, and aligned resume a
   await expect(page.locator('#contact-heading')).toHaveText('Contact');
   await expect(page.locator('.portrait-frame figcaption, .contact-card img')).toHaveCount(0);
   await expect(page.locator('.contact-card svg')).toHaveCount(3);
-  await expect(page.locator('.news time')).toHaveText(['Sep 2026', 'Jun 2026', 'Mar 2025']);
+  await expect(page.locator('.news time')).toHaveText(['09/2026', '06/2026', '05/2026']);
   await expect(page.locator('.numbered-heading h2')).toHaveText(['01 / Research', '02 / Projects', '03 / Experience', '04 / Publications', '05 / Notes']);
   await expect(page.locator('.research-row .eyebrow, .research-art>span, .fine-print')).toHaveCount(0);
   await expect(page.locator('#note-status')).toHaveText('6 notes');
