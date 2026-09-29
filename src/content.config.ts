@@ -3,6 +3,6 @@ import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 const notes = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/notes' }),
-  schema: z.object({ title: z.string().min(1), subtitle: z.string().optional(), date: z.coerce.date(), keywords: z.array(z.string().min(1)).min(1) }),
+  schema: z.object({ title: z.string().min(1), subtitle: z.string().optional(), date: z.coerce.date(), dateLabel: z.string().min(1).optional(), keywords: z.array(z.string().min(1)).min(1), highlight: z.string().min(1).optional() }),
 });
 export const collections = { notes };

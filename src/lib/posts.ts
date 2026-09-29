@@ -24,6 +24,7 @@ export async function getPosts() {
     title: post.data.title,
     date: post.data.date.toISOString(),
     keywords: post.data.keywords,
+    highlight: post.data.highlight,
     url: `/notes/${post.id}/`,
     text: plainText(unified().use(remarkParse).use(remarkMath).parse(post.body || '')).replace(/\s+/g, ' ').trim(),
   })).sort((a, b) => b.date.localeCompare(a.date) || a.id.localeCompare(b.id));

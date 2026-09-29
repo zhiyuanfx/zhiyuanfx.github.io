@@ -9,7 +9,7 @@ const posts = await getPosts();
 </div>
 <p id="note-status" class="note-status" aria-live="polite" aria-atomic="true">{posts.length} notes</p>
 <div id="note-list">
-  {searchPosts(posts).map((post) => <article class="note-card linked-card"><div class="note-copy"><h3><a class="card-link" data-note-link href={post.url}>{post.title}</a></h3><div class="note-date"><time datetime={post.date}>{formatDate(post.date)}</time></div><p class="note-excerpt">{post.excerpt}</p><div class="tags">{post.keywords.map((keyword: string) => <span>{keyword}</span>)}</div></div></article>)}
+  {searchPosts(posts).map((post) => <article class="note-card linked-card"><div class="note-copy"><h3><a class="card-link" data-note-link href={post.url}>{post.title}</a></h3><div class="note-date"><time datetime={post.date}>{formatDate(post.date)}</time></div><p class="note-excerpt">{post.excerpt}</p><div class="tags">{post.keywords.map((keyword: string) => <span>{keyword}</span>)}{post.highlight && <span class="result-tag">{post.highlight}</span>}</div></div></article>)}
 </div>
 <p id="note-empty" class="empty-state" hidden>No notes match your search. Try another word or clear the search.</p>
 <noscript><p class="muted">All notes are listed newest first. Enable JavaScript to search and change their order.</p></noscript>
@@ -61,6 +61,7 @@ const posts = await getPosts();
       const copy = element('div', 'note-copy');
       const tags = element('div', 'tags');
       post.keywords.forEach((keyword: string) => { const tag = element('span', ''); highlight(tag, keyword, query); tags.append(tag); });
+      if (post.highlight) { const result = element('span', 'result-tag'); highlight(result, post.highlight, query); tags.append(result); }
       const heading = element('h3', '');
       const link = document.createElement('a');
       link.className = 'card-link';

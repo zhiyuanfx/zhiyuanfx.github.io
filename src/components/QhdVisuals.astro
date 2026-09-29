@@ -1,0 +1,315 @@
+<style is:global>
+  .prose .qhd-setup {
+    margin: 30px 0;
+    padding: 22px 24px;
+    background: #e9eadf;
+    border-left: 3px solid var(--olive);
+  }
+
+  .prose .qhd-setup strong {
+    display: block;
+    margin-bottom: 7px;
+    color: var(--ink);
+    font-family: var(--serif);
+    font-size: 1.22rem;
+    font-weight: 400;
+    line-height: 1.3;
+  }
+
+  .prose .qhd-setup p {
+    margin: 0;
+  }
+
+  .prose .qhd-part-label {
+    margin-top: 58px;
+    color: var(--olive);
+    font-size: .72rem;
+    font-weight: 600;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+  }
+
+  .prose .qhd-setup ul {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px 28px;
+    margin: 14px 0 0;
+    padding-left: 20px;
+  }
+
+  .prose .qhd-landscape,
+  .prose qhd-benchmark-chart,
+  .prose qhd-evolution {
+    position: relative;
+    left: 50%;
+    display: block;
+    width: min(1080px, calc(100vw - 48px));
+    margin: 38px 0 38px;
+    transform: translateX(-50%);
+  }
+
+  .prose .qhd-landscape img {
+    width: 100%;
+    background: var(--white);
+    border: 1px solid var(--line);
+  }
+
+  .prose .qhd-landscape figcaption {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: .78rem;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 620px) {
+    .prose .qhd-setup {
+      padding: 19px 18px;
+    }
+
+    .prose .qhd-setup ul {
+      grid-template-columns: 1fr;
+    }
+
+    .prose .qhd-landscape,
+    .prose qhd-benchmark-chart,
+    .prose qhd-evolution {
+      width: calc(100vw - 32px);
+    }
+  }
+</style>
+
+<script>
+  type Method = 'qhd' | 'lfmsgd' | 'subgrad';
+  type Benchmark = {
+    name: string;
+    dimension: string;
+    qhd: number[];
+    lfmsgd: number[];
+    subgrad: number[];
+  };
+
+  const sampleCounts = [1, 3, 10, 30, 100];
+  const methodMeta: Record<Method, { label: string; color: string; marker: string }> = {
+    qhd: { label: 'QHD', color: '#b85370', marker: 'triangle' },
+    lfmsgd: { label: 'LFMSGD', color: '#2f83ad', marker: 'square' },
+    subgrad: { label: 'Subgrad', color: '#4f8d42', marker: 'circle' },
+  };
+
+  const benchmarks: Benchmark[] = [
+    { name: 'SCHWEFEL', dimension: '1D', qhd: [2.72e1, 3.29e-1, 1.49e-3, 1.79e-4, 2.37e-6], lfmsgd: [1.37e2, 3.18e1, 5.51e-1, 1.15e-5, 4.20e-13], subgrad: [1.90e2, 7.91e1, 1.17e1, 1.05e-1, 7.98e-9] },
+    { name: 'KEANE', dimension: '2D', qhd: [1.70e-1, 2.58e-2, 3.81e-3, 1.17e-3, 3.37e-4], lfmsgd: [2.17e-1, 5.81e-2, 1.20e-2, 3.22e-3, 7.67e-4], subgrad: [5.31e-1, 4.45e-1, 2.95e-1, 1.24e-1, 1.23e-2] },
+    { name: 'ACKLEY', dimension: '2D', qhd: [3.30e-1, 2.98e-2, 2.67e-2, 2.67e-2, 2.67e-2], lfmsgd: [1.45e1, 8.93, 3.62, 2.14, 3.22e-1], subgrad: [1.09, 3.41e-1, 9.45e-2, 4.48e-2, 2.38e-2] },
+    { name: 'RANA', dimension: '2D', qhd: [1.33e2, 5.35e1, 2.05e1, 6.86, 1.21], lfmsgd: [1.14e2, 5.21e1, 2.10e1, 5.78, 7.28e-1], subgrad: [4.96e1, 5.05e1, 2.17e1, 5.62, 3.08e-1] },
+    { name: 'BUKIN06', dimension: '2D', qhd: [8.19, 2.29, 5.92e-1, 3.67e-1, 3.54e-1], lfmsgd: [5.48e1, 2.65e1, 1.40e1, 7.95, 4.10], subgrad: [1.71e1, 5.90, 2.81, 1.53, 8.26e-1] },
+    { name: 'WF', dimension: '2D', qhd: [4.25, 1.12, 4.73e-2, 2.48e-5, 3.28e-13], lfmsgd: [6.01, 5.41, 3.54, 1.41, 2.57e-1], subgrad: [4.66, 2.78, 6.48e-1, 6.17e-2, 1.86e-2] },
+    { name: 'CARROMTABLE', dimension: '2D', qhd: [1.73e1, 8.45, 1.03, 2.00e-2, 1.41e-2], lfmsgd: [1.95e1, 1.29e1, 3.72, 3.24e-1, 1.77e-2], subgrad: [2.10e1, 1.69e1, 9.81, 2.74, 3.65e-2] },
+    { name: 'XINSHEYANG04', dimension: '2D', qhd: [2.11e-1, 3.63e-2, 1.47e-3, 1.63e-6, 1.27e-16], lfmsgd: [9.34e-1, 7.06e-1, 3.38e-1, 1.02e-1, 2.67e-2], subgrad: [9.63e-1, 8.92e-1, 6.84e-1, 3.23e-1, 3.14e-2] },
+    { name: 'CROWNEDCROSS', dimension: '2D', qhd: [5.88e-1, 4.78e-1, 4.09e-1, 3.54e-1, 3.15e-1], lfmsgd: [1.24, 1.06, 9.43e-1, 8.24e-1, 7.25e-1], subgrad: [1.10, 9.25e-1, 7.26e-1, 6.65e-1, 6.57e-1] },
+    { name: 'DROPWAVE', dimension: '3D', qhd: [1.06e-2, 8.93e-6, 1.81e-16, 2.64e-43, 4.75e-140], lfmsgd: [6.90e-1, 5.02e-1, 2.99e-1, 1.69e-1, 8.94e-2], subgrad: [8.04e-1, 6.93e-1, 5.22e-1, 3.57e-1, 1.71e-1] },
+    { name: 'DAMAVANDI', dimension: '2D', qhd: [2.00, 1.95, 1.73, 1.26, 4.65e-1], lfmsgd: [1.99, 1.97, 1.88, 1.62, 9.04e-1], subgrad: [1.97, 1.88, 1.60, 9.96e-1, 1.88e-1] },
+    { name: 'LAYEB04', dimension: '3D', qhd: [9.65e-1, 2.92e-2, 1.71e-2, 1.35e-2, 1.31e-2], lfmsgd: [2.08e1, 1.85e1, 1.60e1, 1.36e1, 1.11e1], subgrad: [1.81e1, 1.47e1, 1.09e1, 8.09, 5.16] },
+  ];
+
+  const methods: Method[] = ['qhd', 'lfmsgd', 'subgrad'];
+
+  function scientific(value: number) {
+    return value.toExponential(2).replace('e+', 'e');
+  }
+
+  function marker(method: Method, x: number, y: number) {
+    const color = methodMeta[method].color;
+    if (method === 'qhd') return `<path d="M ${x} ${y - 5} L ${x - 5} ${y + 4} L ${x + 5} ${y + 4} Z" fill="${color}"/>`;
+    if (method === 'lfmsgd') return `<rect x="${x - 4}" y="${y - 4}" width="8" height="8" fill="${color}"/>`;
+    return `<circle cx="${x}" cy="${y}" r="4.2" fill="${color}"/>`;
+  }
+
+  class QhdBenchmarkChart extends HTMLElement {
+    active = new Set<Method>(methods);
+    shadow: ShadowRoot;
+
+    constructor() {
+      super();
+      this.shadow = this.attachShadow({ mode: 'open' });
+    }
+
+    connectedCallback() {
+      this.shadow.innerHTML = `
+        <style>
+          :host{display:block;color:var(--ink,#252922);font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+          *{box-sizing:border-box}
+          h3{margin:0;font-family:var(--serif,Georgia,serif);font-size:clamp(1.45rem,2.3vw,2rem);font-weight:400;line-height:1.2;letter-spacing:-.025em}
+          .intro{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:14px}
+          .intro p{max-width:580px;margin:7px 0 0;color:var(--muted,#666b60);font-size:.82rem;line-height:1.55}
+          .legend{display:flex;flex-wrap:wrap;gap:8px 16px;margin:12px 0 19px}
+          .legend button{display:inline-flex;align-items:center;gap:7px;min-height:36px;padding:4px 2px;border:0;background:transparent;color:var(--ink,#252922);font:inherit;font-size:.76rem;cursor:pointer}
+          .legend button[aria-pressed="false"]{opacity:.4;text-decoration:line-through}
+          .swatch{display:block;width:18px;height:3px;background:var(--swatch)}
+          .plots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+          .plot{min-width:0;padding:12px 10px 7px;background:color-mix(in srgb,var(--white,#faf8f2) 72%,transparent);border:1px solid var(--line,#d3d1c5)}
+          .plot h4{margin:0 0 2px 6px;font-family:var(--serif,Georgia,serif);font-size:.91rem;font-weight:400;letter-spacing:.02em}
+          .plot h4 span{color:var(--muted,#666b60);font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:.68rem}
+          svg{display:block;width:100%;height:auto;overflow:visible}
+          .grid{stroke:var(--line,#d3d1c5);stroke-width:1}
+          .frame{fill:none;stroke:var(--line,#d3d1c5);stroke-width:1}
+          .axis,.axis-title{fill:var(--muted,#666b60);font-size:13px}
+          .axis-title{fill:var(--ink,#252922)}
+          .series{fill:none;stroke-width:2.2;stroke-linejoin:round;stroke-linecap:round}
+          .point{outline:none}
+          .focus-ring{fill:none;stroke:none}
+          .point:focus .focus-ring{stroke:var(--ink,#252922);stroke-width:1.5;fill:none}
+          details{margin-top:22px;border-top:1px solid var(--line,#d3d1c5);padding-top:13px}
+          summary{color:var(--olive,#596348);font-size:.78rem;cursor:pointer}
+          .table-wrap{margin-top:12px;overflow-x:auto}
+          table{width:100%;border-collapse:collapse;font-size:.72rem;font-variant-numeric:tabular-nums}
+          th,td{padding:7px 9px;border-bottom:1px solid var(--line,#d3d1c5);text-align:right;white-space:nowrap}
+          th:first-child,td:first-child{text-align:left}
+          th{color:var(--ink,#252922);font-weight:600}
+          td{color:var(--muted,#666b60)}
+          @media(max-width:620px){.intro{display:block}.plots{grid-template-columns:1fr}.plot{padding-inline:5px}.axis,.axis-title{font-size:14px}}
+        </style>
+        <div class="intro">
+          <div><h3>Best-of-k gap across 12 landscapes</h3><p>Lower is better. Both axes are logarithmic, and every panel uses its own vertical scale so that the trend remains visible.</p></div>
+        </div>
+        <div class="legend" aria-label="Toggle benchmark series"></div>
+        <div class="plots"></div>
+        <details><summary>View all published values</summary><div class="table-wrap"><table><thead><tr><th>Function / k</th><th>QHD</th><th>LFMSGD</th><th>Subgrad</th></tr></thead><tbody></tbody></table></div></details>
+      `;
+      const legend = this.shadow.querySelector('.legend')!;
+      methods.forEach((method) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.dataset.method = method;
+        button.setAttribute('aria-pressed', 'true');
+        button.innerHTML = `<span class="swatch" style="--swatch:${methodMeta[method].color}"></span>${methodMeta[method].label}`;
+        button.addEventListener('click', () => {
+          if (this.active.has(method) && this.active.size === 1) return;
+          if (this.active.has(method)) this.active.delete(method); else this.active.add(method);
+          button.setAttribute('aria-pressed', String(this.active.has(method)));
+          this.renderPlots();
+        });
+        legend.append(button);
+      });
+      const body = this.shadow.querySelector('tbody')!;
+      body.innerHTML = benchmarks.flatMap((benchmark) => sampleCounts.map((k, index) => `
+        <tr><td>${benchmark.name} (${benchmark.dimension}) / ${k}</td><td>${scientific(benchmark.qhd[index])}</td><td>${scientific(benchmark.lfmsgd[index])}</td><td>${scientific(benchmark.subgrad[index])}</td></tr>
+      `)).join('');
+      this.renderPlots();
+    }
+
+    renderPlots() {
+      const container = this.shadow.querySelector('.plots');
+      if (!container) return;
+      container.innerHTML = benchmarks.map((benchmark) => this.plot(benchmark)).join('');
+    }
+
+    plot(benchmark: Benchmark) {
+      const width = 330;
+      const height = 218;
+      const left = 58;
+      const right = 14;
+      const top = 13;
+      const bottom = 42;
+      const innerWidth = width - left - right;
+      const innerHeight = height - top - bottom;
+      const visible = methods.filter((method) => this.active.has(method));
+      const all = visible.flatMap((method) => benchmark[method]);
+      let minExponent = Math.floor(Math.log10(Math.min(...all)));
+      let maxExponent = Math.ceil(Math.log10(Math.max(...all)));
+      if (minExponent === maxExponent) { minExponent -= 1; maxExponent += 1; }
+      const x = (value: number) => left + (Math.log10(value) / 2) * innerWidth;
+      const y = (value: number) => top + ((maxExponent - Math.log10(value)) / (maxExponent - minExponent)) * innerHeight;
+      const midExponent = Math.round((minExponent + maxExponent) / 2);
+      const yTicks = [...new Set([maxExponent, midExponent, minExponent])];
+      const grid = yTicks.map((exponent) => {
+        const py = y(10 ** exponent);
+        return `<line class="grid" x1="${left}" x2="${width - right}" y1="${py}" y2="${py}"/><text class="axis" x="${left - 8}" y="${py + 4}" text-anchor="end">1e${exponent}</text>`;
+      }).join('');
+      const xTicks = [1, 10, 100].map((tick) => `<line class="grid" x1="${x(tick)}" x2="${x(tick)}" y1="${top}" y2="${height - bottom}"/><text class="axis" x="${x(tick)}" y="${height - bottom + 19}" text-anchor="middle">${tick}</text>`).join('');
+      const paths = visible.map((method) => {
+        const values = benchmark[method];
+        const points = values.map((value, index) => `${x(sampleCounts[index])},${y(value)}`).join(' ');
+        const marks = values.map((value, index) => {
+          const px = x(sampleCounts[index]);
+          const py = y(value);
+          const label = `${methodMeta[method].label}, k=${sampleCounts[index]}, gap ${scientific(value)}`;
+          return `<g class="point" tabindex="0" role="img" aria-label="${label}"><circle class="focus-ring" cx="${px}" cy="${py}" r="8"/>${marker(method, px, py)}<title>${label}</title></g>`;
+        }).join('');
+        return `<polyline class="series" points="${points}" stroke="${methodMeta[method].color}"/>${marks}`;
+      }).join('');
+      return `<section class="plot"><h4>${benchmark.name} <span>${benchmark.dimension}</span></h4><svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Best-of-k optimality gap for ${benchmark.name}"><rect class="frame" x="${left}" y="${top}" width="${innerWidth}" height="${innerHeight}"/>${grid}${xTicks}${paths}<text class="axis-title" x="${left + innerWidth / 2}" y="${height - 5}" text-anchor="middle">samples k</text><text class="axis-title" transform="translate(14 ${top + innerHeight / 2}) rotate(-90)" text-anchor="middle">optimality gap</text></svg></section>`;
+    }
+  }
+
+  const iterations = [10, 100, 1000, 2500, 10000];
+  const stages = ['Kinetic exploration', 'Early redistribution', 'Global search', 'Localization', 'Final concentration'];
+  const evolutionMethods = [
+    { key: 'qhd', label: 'QHD', description: 'Quantum probability distribution' },
+    { key: 'subgrad', label: 'Subgrad', description: 'Distribution of randomized trajectories' },
+    { key: 'lfmsgd', label: 'LFMSGD', description: 'Distribution of stochastic trajectories' },
+  ];
+
+  class QhdEvolution extends HTMLElement {
+    index = 0;
+    shadow: ShadowRoot;
+
+    constructor() {
+      super();
+      this.shadow = this.attachShadow({ mode: 'open' });
+    }
+
+    connectedCallback() {
+      this.shadow.innerHTML = `
+        <style>
+          :host{display:block;color:var(--ink,#252922);font-family:Inter,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+          *{box-sizing:border-box}
+          h3{margin:0;font-family:var(--serif,Georgia,serif);font-size:clamp(1.45rem,2.3vw,2rem);font-weight:400;line-height:1.2;letter-spacing:-.025em}
+          .intro{display:flex;align-items:end;justify-content:space-between;gap:20px}
+          .stage{margin:0;color:var(--olive,#596348);font-size:.78rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+          .controls{display:flex;flex-wrap:wrap;gap:7px;margin:18px 0}
+          button{min-width:70px;padding:8px 12px;border:1px solid var(--line,#d3d1c5);background:transparent;color:var(--ink,#252922);font:inherit;font-size:.76rem;cursor:pointer}
+          button[aria-pressed="true"]{background:var(--olive,#596348);border-color:var(--olive,#596348);color:var(--white,#faf8f2)}
+          .panels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+          figure{min-width:0;margin:0;background:color-mix(in srgb,var(--white,#faf8f2) 72%,transparent);border:1px solid var(--line,#d3d1c5)}
+          img{display:block;width:100%;height:auto;aspect-ratio:1;object-fit:contain}
+          figcaption{padding:11px 13px 13px;color:var(--muted,#666b60);font-size:.72rem;line-height:1.45}
+          figcaption strong{display:block;margin-bottom:2px;color:var(--ink,#252922);font-family:var(--serif,Georgia,serif);font-size:1rem;font-weight:400}
+          .note{margin:13px 0 0;color:var(--muted,#666b60);font-size:.74rem;line-height:1.55}
+          @media(max-width:700px){.intro{display:block}.stage{margin-top:7px}.panels{grid-template-columns:1fr}.controls button{flex:1 1 82px}.panels figure{display:grid;grid-template-columns:minmax(0,180px) 1fr;align-items:center}.panels figcaption{padding:12px}}
+          @media(max-width:420px){.panels figure{grid-template-columns:1fr}.panels img{max-width:260px;margin:auto}}
+        </style>
+        <div class="intro"><h3>XINSHEYANG04 through time</h3><p class="stage" aria-live="polite"></p></div>
+        <div class="controls" aria-label="Choose an iteration"></div>
+        <div class="panels"></div>
+        <p class="note">Each panel is a probability or endpoint distribution at the selected iteration. For QHD, m=t/h=1000t.</p>
+      `;
+      const controls = this.shadow.querySelector('.controls')!;
+      iterations.forEach((iteration, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = `m = ${iteration}`;
+        button.setAttribute('aria-pressed', String(index === 0));
+        button.addEventListener('click', () => {
+          this.index = index;
+          this.shadow.querySelectorAll('button').forEach((item, itemIndex) => item.setAttribute('aria-pressed', String(itemIndex === index)));
+          this.renderPanels();
+        });
+        controls.append(button);
+      });
+      this.renderPanels();
+    }
+
+    renderPanels() {
+      const iteration = iterations[this.index];
+      const stage = this.shadow.querySelector('.stage');
+      if (stage) stage.textContent = stages[this.index];
+      const panels = this.shadow.querySelector('.panels');
+      if (!panels) return;
+      panels.innerHTML = evolutionMethods.map((method) => `
+        <figure><img src="/images/qhd/${method.key}-${iteration}.png" alt="${method.label} distribution on XINSHEYANG04 at iteration ${iteration}" width="600" height="600" loading="lazy"><figcaption><strong>${method.label}</strong>${method.description}</figcaption></figure>
+      `).join('');
+    }
+  }
+
+  if (!customElements.get('qhd-benchmark-chart')) customElements.define('qhd-benchmark-chart', QhdBenchmarkChart);
+  if (!customElements.get('qhd-evolution')) customElements.define('qhd-evolution', QhdEvolution);
+</script>
