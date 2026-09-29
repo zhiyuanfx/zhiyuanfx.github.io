@@ -200,5 +200,25 @@
 .contact-card>a:not(.button){transition:background .2s,border-color .2s,transform .2s}
 .contact-card>a:not(.button):is(:hover,:focus-visible){background:color-mix(in srgb,var(--paper) 94%,var(--ink));border-color:var(--line);transform:translateY(-2px)}
 @media(prefers-reduced-motion:reduce){
-  .contact-card>a:is(:hover,:focus-visible){transform:none}
+.contact-card>a:is(:hover,:focus-visible){transform:none}
 }
+
+/* Category chips, titles, descriptions, and arrows align across preview cards. */
+.work-card>.eyebrow{display:inline-flex;align-items:center;justify-self:start;min-height:27px;padding:3px 9px;border:1px solid #d5d8ca;border-radius:2px;line-height:1.65;letter-spacing:.08em}
+@media(min-width:761px){
+  .work-card{display:grid;grid-template-rows:subgrid;grid-row:span 4;row-gap:9px;align-items:start}
+  .work-card h3{margin:0}
+  .work-card .work-arrow{margin:0;padding-top:0;align-self:end}
+}
+.research-tags{display:grid;gap:10px}
+.research-keywords,.research-results{align-items:stretch}
+.research-keywords>span,.research-results>span{display:inline-flex;align-items:center;min-height:27px}
+.prose .sampling-figure{margin:32px 0}
+.sampling-figure img{width:100%;background:white;border:1px solid var(--line);padding:10px}
+.sampling-figure figcaption{margin-top:12px;font-size:.78rem;line-height:1.6;color:var(--muted)}
+.prose table{max-width:100%;width:100%;font-size:.82rem;line-height:1.55;margin:26px 0;background:#faf8f180}
+.prose th{background:#e9eadf;color:var(--ink);font-weight:600;white-space:nowrap}
+.prose td{font-variant-numeric:tabular-nums}
+.prose th,.prose td{padding:10px 13px}
+.prose tbody tr:nth-child(even){background:#e9eadf40}
+.prose h3 code{font-size:.75em}

@@ -39,7 +39,7 @@ for (const item of [...research, ...projects, ...experience, ...publications]) {
       <div class="research-list">{research.map((item) => <article id={item.id} class="research-row linked-card reveal">
         <div class="research-art"><ResearchVisual type={item.visual} /></div>
         <div><h3><a class="card-link" data-note-link href={noteUrl(item.noteId)}>{item.title}</a></h3><p>{item.description}</p>
-          <div class="tags research-tags">{item.keywords.map((keyword) => <span>{keyword}</span>)}{item.metrics.map((metric) => <span class="result-tag">{metric}</span>)}</div>
+          <div class="research-tags"><div class="tags research-keywords" aria-label="Research keywords">{item.keywords.map((keyword) => <span>{keyword}</span>)}</div>{item.metrics.length > 0 && <div class="tags research-results" aria-label="Research highlights">{item.metrics.map((metric) => <span class="result-tag">{metric}</span>)}</div>}</div>
         </div>
       </article>)}</div>
     </section>

@@ -22,7 +22,7 @@ npm run preview
 
 Update `src/data/profile.ts` for the introduction, contact links, news, research, projects, experience, education, and publication. The portrait, capybara illustration, and downloadable résumé live in `src/assets/`. Main styling is in `src/styles/global.css`.
 
-The collection contains two mathematical demonstration notes and four explicitly labeled placeholders for research and project write-ups. Research, experience, and publication entries share related notes through `noteId` in the profile data. The homepage build checks that every referenced note exists.
+The collection contains research and project write-ups, including placeholders for upcoming notes. Research, experience, and publication entries share related notes through `noteId` in the profile data. The homepage build checks that every referenced note exists.
 
 ## Add a local note post
 
@@ -78,6 +78,6 @@ Browser tests exercise 320, 375, 768, 1440, and 1920 pixel widths, math overflow
 
 The existing `.github/workflows/deploy.yml` builds and deploys to GitHub Pages on pushes to `main` or manual workflow dispatch. The configured production URL is `https://zhiyuanfx.github.io`. This implementation does not publish anything automatically from your local workspace; committing and pushing to `main` will trigger the existing workflow.
 
-The footer last-update date is explicit in `profile.lastUpdated`; update it when revising site content. The footer illustration currently reuses the supplied capybara as a placeholder for a future asset. The two original `/blogs/` article URLs redirect to `/notes/` for compatibility.
+The footer last-update date is explicit in `profile.lastUpdated`; update it when revising site content. The footer illustration currently reuses the supplied capybara as a placeholder for a future asset.
 
 Notes may include an optional `subtitle` frontmatter field; it appears immediately below the main title.

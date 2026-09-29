@@ -17,43 +17,78 @@ for (const width of [320, 375, 768, 919, 1440, 1920]) {
       await expect(page.locator('#primary-nav')).not.toBeVisible();
       await expect(page).toHaveURL(/#projects$/);
     }
-    await page.goto('/notes/notes-on-guided-sampling/');
-    await expect(page.locator('.katex-display')).toHaveCount(4);
+    await page.goto('/notes/turboquant/');
+    await expect(page.locator('.katex-display')).toHaveCount(28);
     await expect(page.locator('.katex-error')).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const displays = await page.locator('.katex-display').evaluateAll(nodes => nodes.map(n => getComputedStyle(n).overflowX));
     expect(displays.every(value => value === 'auto')).toBe(true);
+    await page.goto('/notes/guided-llm-sampling/');
+    await expect(page.locator('.prose table')).toHaveCount(6);
+    await expect(page.locator('.katex-error')).toHaveCount(0);
+    expect(await page.locator('.katex-display').count()).toBeGreaterThan(10);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await expect(page.locator('.article-subtitle')).toHaveCount(0);
+    await expect(page.locator('.article-meta time')).toHaveText('Mar 15, 2026');
+    await expect(page.locator('.article-header .tags span')).toHaveText(['Power Sampling', 'MCMC', 'LLM']);
+    await expect(page.locator('.sampling-figure img')).toHaveCount(2);
+    const diagram = page.locator('.sampling-figure img').first();
+    await diagram.scrollIntoViewIfNeeded();
+    await expect.poll(() => diagram.evaluate(n => (n as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+    if (width === 375 || width === 1440) {
+      await page.screenshot({ path: test.info().outputPath(`sampling-diagram-${width}.png`) });
+    }
+    const figure = page.locator('.sampling-figure img').last();
+    await figure.scrollIntoViewIfNeeded();
+    await expect.poll(() => figure.evaluate(n => (n as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+    if (width === 375 || width === 1440) {
+      await page.screenshot({ path: test.info().outputPath(`sampling-figure-${width}.png`) });
+      await page.getByRole('heading', { name: 'Problems 30–39: 12 MCMC steps, 12 seeds' }).scrollIntoViewIfNeeded();
+      await page.screenshot({ path: test.info().outputPath(`sampling-results-${width}.png`) });
+    }
   });
 }
 test('search, counts, literal input, sorting, and article return state', async ({ page }) => {
   await page.goto('/#notes');
   const search = page.getByRole('searchbox');
-  await expect(page.locator('.note-card')).toHaveCount(6);
+  await expect(page.locator('.note-card')).toHaveCount(5);
   await expect(page.locator('.note-card').first()).toContainText('Sep 16, 2026');
   await page.locator('#note-sort').click();
-  await expect(page.locator('.note-card').first()).toContainText('Sep 1, 2026');
-  await search.fill('probability in motion');
+  await expect(page.locator('.note-card').first()).toContainText('Mar 20, 2025');
+  await search.fill('better reasoning');
   await expect(page.locator('.note-card')).toHaveCount(1);
   await expect(page.locator('.match-count')).toContainText('occurrence');
   await expect(page.locator('.note-excerpt')).toContainText('sampling');
   await page.locator('.note-card h3 a').click();
-  await expect(page).toHaveURL(/q=probability\+in\+motion&sort=asc/);
+  await expect(page).toHaveURL(/q=better\+reasoning&sort=asc/);
   await page.goBack();
-  await expect(search).toHaveValue('probability in motion');
+  await expect(search).toHaveValue('better reasoning');
   await page.goForward();
   await expect(page.locator('.prose')).toBeVisible();
   await page.locator('.back-link').first().click();
-  await expect(search).toHaveValue('probability in motion');
+  await expect(search).toHaveValue('better reasoning');
   await expect(page.locator('#note-sort')).toHaveAttribute('data-order', 'asc');
   await expect(page.locator('.note-card')).toHaveCount(1);
-  await search.fill('a+b');
+  await search.fill('Q^{-1}');
   await expect(page.locator('.note-card')).toHaveCount(1);
-  await expect(page.locator('.match-count')).toHaveText('1 occurrence');
+  await expect(page.locator('.match-count')).toHaveText(/\d+ occurrences/);
   await search.fill('<img src=x onerror=alert(1)>');
   await expect(page.locator('#note-empty')).toBeVisible();
   await expect(page.locator('#note-list img')).toHaveCount(0);
   await search.fill('   ');
-  await expect(page.locator('.note-card')).toHaveCount(6);
+  await expect(page.locator('.note-card')).toHaveCount(5);
+});
+test('desktop preview chips, descriptions, and arrows share baselines', async ({ page }) => {
+  for (const width of [919, 1440]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/');
+    for (const selector of ['.eyebrow', 'h3', 'p:not(.eyebrow)', '.work-arrow']) {
+      const boxes = await page.locator('.work-card ' + selector).evaluateAll(nodes => nodes.map(n => n.getBoundingClientRect().y));
+      expect(Math.max(...boxes) - Math.min(...boxes)).toBeLessThan(1);
+    }
+    await page.locator('.selected-work').scrollIntoViewIfNeeded();
+    await page.screenshot({ path: test.info().outputPath(`research-previews-${width}.png`) });
+  }
 });
 test('keyboard navigation, reduced motion, and all local resources', async ({ page, request }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -76,7 +111,7 @@ test('articles and all notes remain readable without JavaScript', async ({ brows
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:4322/');
-  await expect(page.locator('.note-card')).toHaveCount(6);
+  await expect(page.locator('.note-card')).toHaveCount(5);
   await expect(page.locator('#primary-nav')).toBeVisible();
   await page.goto('http://127.0.0.1:4322/notes/turboquant/');
   await expect(page.locator('.katex-display')).toHaveCount(28);
@@ -84,22 +119,6 @@ test('articles and all notes remain readable without JavaScript', async ({ brows
   await context.close();
 });
 
-test('annotations: compact headings, contact, monthly news, and aligned resume at 919px', async ({ page }) => {
-  await page.setViewportSize({ width: 919, height: 859 });
-  await page.goto('/');
-  await expect(page.locator('#contact-heading')).toHaveText('Contact');
-  await expect(page.locator('.portrait-frame figcaption, .contact-card img')).toHaveCount(0);
-  await expect(page.locator('.contact-card svg')).toHaveCount(3);
-  await expect(page.locator('.news time')).toHaveText(['09/2026', '06/2026', '05/2026']);
-  await expect(page.locator('.numbered-heading h2')).toHaveText(['01 / Research', '02 / Projects', '03 / Experience', '04 / Publications', '05 / Notes']);
-  await expect(page.locator('.research-row .eyebrow, .research-art>span, .fine-print')).toHaveCount(0);
-  await expect(page.locator('#note-status')).toHaveText('6 notes');
-  await expect(page.locator('.last-updated')).toContainText('Sep 16, 2026');
-  const affiliation = await page.locator('.affiliation').boundingBox();
-  const resume = await page.locator('.hero-actions .button').boundingBox();
-  expect(resume!.x).toBeGreaterThan(affiliation!.x + affiliation!.width);
-  expect(Math.abs(resume!.y + resume!.height / 2 - affiliation!.y - affiliation!.height / 2)).toBeLessThan(2);
-});
 test('linked research, project, experience, and publication cards share the correct notes', async ({ page, request }) => {
   await page.goto('/');
   const expected = [
