@@ -78,8 +78,8 @@ test('articles and all notes remain readable without JavaScript', async ({ brows
   await page.goto('http://127.0.0.1:4322/');
   await expect(page.locator('.note-card')).toHaveCount(6);
   await expect(page.locator('#primary-nav')).toBeVisible();
-  await page.goto('http://127.0.0.1:4322/notes/notes-on-optimization/');
-  await expect(page.locator('.katex-display')).toHaveCount(4);
+  await page.goto('http://127.0.0.1:4322/notes/turboquant/');
+  await expect(page.locator('.katex-display')).toHaveCount(28);
   await expect(page.locator('.katex-error')).toHaveCount(0);
   await context.close();
 });

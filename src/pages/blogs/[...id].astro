@@ -1,6 +1,6 @@
 ---
 export function getStaticPaths() {
-  return ['notes-on-guided-sampling', 'notes-on-optimization'].map(id => ({ params: { id } }));
+  return ['notes-on-guided-sampling'].map(id => ({ params: { id } }));
 }
 const destination = `/notes/${Astro.params.id}/`;
 ---
