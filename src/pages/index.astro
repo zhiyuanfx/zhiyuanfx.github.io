@@ -5,6 +5,8 @@ import SiteLayout from '../layouts/SiteLayout.astro';
 import ResearchVisual from '../components/ResearchVisual.astro';
 import ArtDetectionVisual from '../components/ArtDetectionVisual.astro';
 import YourPlanVisual from '../components/YourPlanVisual.astro';
+import GPTCheckVisual from '../components/GPTCheckVisual.astro';
+import TradingVisual from '../components/TradingVisual.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import ContactIcon from '../components/ContactIcon.astro';
 import NotesList from '../components/NotesList.astro';
@@ -47,7 +49,7 @@ for (const item of [...research, ...projects, ...experience, ...publications]) {
     <section id="projects" data-section class="content-section" aria-labelledby="projects-heading">
       <SectionHeading id="projects-heading" number="02" title="Projects" />
       {projects.map((project) => <article class="project-card linked-card reveal">
-        <div class="project-illustration">{project.noteId === 'yourplan' ? <YourPlanVisual /> : <ArtDetectionVisual />}</div>
+        <div class="project-illustration">{project.noteId === 'webull-auto-trading' ? <TradingVisual /> : project.noteId === 'yourplan' ? <YourPlanVisual /> : project.noteId === 'gptcheck' ? <GPTCheckVisual /> : <ArtDetectionVisual />}</div>
         <div class="project-copy"><h3><a class="card-link" data-note-link href={noteUrl(project.noteId)}>{project.title}</a></h3><p class="project-subtitle">{project.subtitle}</p><p>{project.description}</p><p>{project.detail}</p><div class="tags">{[...project.keywords, ...project.technologies].map((keyword) => <span>{keyword}</span>)}</div></div>
       </article>)}
     </section>
