@@ -203,10 +203,9 @@
 .contact-card>a:is(:hover,:focus-visible){transform:none}
 }
 
-/* Category chips, titles, descriptions, and arrows align across preview cards. */
-.work-card>.eyebrow{display:inline-flex;align-items:center;justify-self:start;min-height:27px;padding:3px 9px;border:1px solid #d5d8ca;border-radius:2px;line-height:1.65;letter-spacing:.08em}
+/* Titles, descriptions, and arrows align across preview cards. */
 @media(min-width:761px){
-  .work-card{display:grid;grid-template-rows:subgrid;grid-row:span 4;row-gap:9px;align-items:start}
+  .work-card{display:grid;grid-template-rows:subgrid;grid-row:span 3;row-gap:9px;align-items:start}
   .work-card h3{margin:0}
   .work-card .work-arrow{margin:0;padding-top:0;align-self:end}
 }

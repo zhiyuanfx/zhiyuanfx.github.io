@@ -78,11 +78,11 @@ test('search, counts, literal input, sorting, and article return state', async (
   await search.fill('   ');
   await expect(page.locator('.note-card')).toHaveCount(5);
 });
-test('desktop preview chips, descriptions, and arrows share baselines', async ({ page }) => {
+test('desktop preview titles, descriptions, and arrows share baselines', async ({ page }) => {
   for (const width of [919, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     await page.goto('/');
-    for (const selector of ['.eyebrow', 'h3', 'p:not(.eyebrow)', '.work-arrow']) {
+    for (const selector of ['h3', 'p', '.work-arrow']) {
       const boxes = await page.locator('.work-card ' + selector).evaluateAll(nodes => nodes.map(n => n.getBoundingClientRect().y));
       expect(Math.max(...boxes) - Math.min(...boxes)).toBeLessThan(1);
     }
