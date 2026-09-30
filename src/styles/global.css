@@ -243,3 +243,13 @@
 .framework-storage{border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin-top:22px;padding:16px;text-align:center}
 .trading-framework figcaption{margin-top:17px;font-size:.78rem;line-height:1.6;color:var(--muted)}
 @media(max-width:650px){.trading-framework{padding:16px}.framework-flow{grid-template-columns:1fr;gap:8px}.trading-framework .framework-arrow{transform:rotate(90deg)}.framework-branches{grid-template-columns:1fr;gap:14px}.framework-node{padding:16px}.framework-storage{padding:16px 0}}
+
+.prose .qiprune-figure{margin:32px 0}
+.qiprune-panels{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px;align-items:start}
+.qiprune-panels img{width:100%;height:auto;background:white;border:1px solid var(--line);padding:8px}
+.prose .qiprune-panels p{font-size:.78rem;text-align:center;margin:8px 0}
+.qiprune-figure figcaption{font-size:.78rem;line-height:1.6;color:var(--muted);margin-top:12px}
+@media(max-width:600px){.qiprune-panels{grid-template-columns:1fr;gap:18px}}
+
+/* Fit QIPrune table backgrounds to their cells while retaining mobile scrolling. */
+.qiprune-prose table{width:fit-content;max-width:100%}

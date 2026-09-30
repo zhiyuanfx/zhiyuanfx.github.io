@@ -31,6 +31,21 @@ for (const width of [320, 375, 768, 919, 1440, 1920]) {
     if (width === 375 || width === 1440) {
       await page.locator('.trading-framework').screenshot({ path: test.info().outputPath(`trading-framework-${width}.png`) });
     }
+    await page.goto('/notes/llm-sparsity/');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('QIPrune: Quantum-Inspired Pruning of Large Language Models');
+    await expect(page.locator('.katex-error')).toHaveCount(0);
+    await expect(page.locator('.prose table')).toHaveCount(4);
+    await expect(page.locator('.qiprune-panels img')).toHaveCount(2);
+    for (const image of await page.locator('.qiprune-panels img').all()) {
+      await image.scrollIntoViewIfNeeded();
+      await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    if (width === 375 || width === 1440) {
+      await page.locator('.qiprune-figure').screenshot({ path: test.info().outputPath(`qiprune-figure-${width}.png`) });
+      await page.getByRole('heading', { name: 'Test set: WikiText-2', exact: true }).scrollIntoViewIfNeeded();
+      await page.screenshot({ path: test.info().outputPath(`qiprune-results-${width}.png`) });
+    }
     await page.goto('/notes/turboquant/');
     await expect(page.locator('.katex-display')).toHaveCount(28);
     await expect(page.locator('.katex-error')).toHaveCount(0);
