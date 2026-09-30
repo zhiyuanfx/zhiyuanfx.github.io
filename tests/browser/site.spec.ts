@@ -51,10 +51,10 @@ for (const width of [320, 375, 768, 919, 1440, 1920]) {
 test('search, counts, literal input, sorting, and article return state', async ({ page }) => {
   await page.goto('/#notes');
   const search = page.getByRole('searchbox');
-  await expect(page.locator('.note-card')).toHaveCount(5);
+  await expect(page.locator('.note-card')).toHaveCount(6);
   await expect(page.locator('.note-card').first()).toContainText('Sep 16, 2026');
   await page.locator('#note-sort').click();
-  await expect(page.locator('.note-card').first()).toContainText('Mar 20, 2025');
+  await expect(page.locator('.note-card').first()).toContainText('Nov 1, 2023');
   await search.fill('better reasoning');
   await expect(page.locator('.note-card')).toHaveCount(1);
   await expect(page.locator('.match-count')).toContainText('occurrence');
@@ -76,7 +76,7 @@ test('search, counts, literal input, sorting, and article return state', async (
   await expect(page.locator('#note-empty')).toBeVisible();
   await expect(page.locator('#note-list img')).toHaveCount(0);
   await search.fill('   ');
-  await expect(page.locator('.note-card')).toHaveCount(5);
+  await expect(page.locator('.note-card')).toHaveCount(6);
 });
 test('desktop preview titles, descriptions, and arrows share baselines', async ({ page }) => {
   for (const width of [919, 1440]) {
@@ -111,7 +111,7 @@ test('articles and all notes remain readable without JavaScript', async ({ brows
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:4322/');
-  await expect(page.locator('.note-card')).toHaveCount(5);
+  await expect(page.locator('.note-card')).toHaveCount(6);
   await expect(page.locator('#primary-nav')).toBeVisible();
   await page.goto('http://127.0.0.1:4322/notes/turboquant/');
   await expect(page.locator('.katex-display')).toHaveCount(28);
@@ -125,7 +125,8 @@ test('linked research, project, experience, and publication cards share the corr
     ['#llm-sparsity', '/notes/llm-sparsity/'],
     ['#guided-sampling', '/notes/guided-llm-sampling/'],
     ['#quantum-optimization', '/notes/quantum-hamiltonian-descent/'],
-    ['.project-card', '/notes/ai-art-detection/'],
+    ['.project-card:nth-of-type(1)', '/notes/ai-art-detection/'],
+    ['.project-card:nth-of-type(2)', '/notes/yourplan/'],
     ['.timeline-row:nth-child(1)', '/notes/guided-llm-sampling/'],
     ['.timeline-row:nth-child(2)', '/notes/llm-sparsity/'],
     ['.timeline-row:nth-child(3)', '/notes/quantum-hamiltonian-descent/'],
