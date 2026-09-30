@@ -32,6 +32,9 @@ export const education = [
   { date: 'Expected 2026 — 2031', title: 'PhD · Industrial Engineering', detail: 'University of Washington · Advisor Prof. Chaoyue Zhao' },
   { date: '2022 — 2026', title: 'BS · Computer Science & Applied Mathematics', detail: 'University of Washington · Double major · GPA 4.00/4.00 · Dean’s List 2022–2026' },
 ];
-export const publications = [{ noteId: 'quantum-hamiltonian-descent', keywords: ['Optimization'], title: 'Quantum Hamiltonian Descent for Non-smooth Optimization', authors: 'Jiaqi Leng, Yufan Zheng, Zhiyuan Jia, Lei Fan, Chaoyue Zhao, et al.', year: '2025', status: 'arXiv preprint · Submitted to Operations Research', href: 'https://arxiv.org/abs/2503.15878' }];
+export const publications = [
+  { noteId: 'llm-sparsity', keywords: ['Optimization', 'LLM Sparsity'], title: 'QIPrune: Quantum-Inspired Pruning of Large Language Models', authors: 'Zhiyuan Jia, Pengyu Liu, Yu-Hsuan Wu, Tabish Shaik, Jianhao Ma, Jiaqi Leng, Xiaodi Wu, Chaoyue Zhao, Yuxiang Peng', year: '2026', month: 'May', date: '2026-05', status: 'Submitted to NeurIPS 2026', href: '/documents/qiprune.pdf', linkLabel: 'Download paper', download: 'QIPrune.pdf' },
+  { noteId: 'quantum-hamiltonian-descent', keywords: ['Optimization'], title: 'Quantum Hamiltonian Descent for Non-smooth Optimization', authors: 'Jiaqi Leng, Yufan Zheng, Zhiyuan Jia, Lei Fan, Chaoyue Zhao, et al.', year: '2025', month: 'May', date: '2025-05', status: 'arXiv preprint · Submitted to Operations Research', href: 'https://arxiv.org/abs/2503.15878', linkLabel: 'Read on arXiv', download: undefined },
+];
 
 export const noteUrl = (id: string) => `/notes/${id}/`;

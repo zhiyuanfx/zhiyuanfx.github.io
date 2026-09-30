@@ -253,3 +253,6 @@
 
 /* Fit QIPrune table backgrounds to their cells while retaining mobile scrolling. */
 .qiprune-prose table{width:fit-content;max-width:100%}
+
+.publication-date{display:flex;flex-direction:column;gap:3px}
+.publication-date .publication-month,.publication-date .publication-year{font-family:var(--serif);font-size:1.5rem;font-weight:400;color:var(--olive);line-height:1.2}
