@@ -5,7 +5,7 @@ export const profile = {
   email: 'zyj3@uw.edu',
   linkedin: 'https://www.linkedin.com/in/zhiyuan-jia-241533295',
   github: 'https://github.com/zhiyuanfx',
-  bio: 'I’m a PhD student in Industrial Engineering at the University of Washington, starting in September 2026 and advised by Prof. Chaoyue Zhao. I also completed my undergraduate studies at UW, double majoring in Computer Science and Applied Mathematics. My research focuses on identifying and formulating optimization problems for efficient AI systems, particularly LLM sparsification and guided sampling. To solve these problems, I adapt advanced algorithms like Quantum Hamiltonian Descent for performance gains over classical methods. I’m currently also exploring optimization models to help small business owners be more resilient to external market shocks.',
+  bio: 'I’m a <strong>PhD student in Industrial Engineering</strong> at the University of Washington, starting in September 2026 and advised by <strong>Prof. Chaoyue Zhao</strong>. I also completed my undergraduate studies at UW, double majoring in Computer Science and Applied Mathematics. My research focuses on identifying and formulating <strong>optimization problems for efficient AI systems</strong>, particularly <strong>LLM sparsification</strong> and <strong>guided sampling</strong>. To solve these problems, I adapt advanced algorithms like Quantum Hamiltonian Descent for performance gains over classical methods. I’m currently also exploring optimization models to help small business owners be more resilient to external market shocks.',
 };
 export const news: { date: string; label: string; text: string; href?: string }[] = [
   { date: '2026-09', label: '09/2026', text: 'Began PhD studies in Industrial Engineering at UW.' },

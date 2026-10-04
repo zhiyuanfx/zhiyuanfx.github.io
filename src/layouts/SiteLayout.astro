@@ -6,7 +6,7 @@ import { profile, sections } from '../data/profile';
 import '../styles/global.css';
 import { formatDate } from '../lib/posts';
 interface Props { title?: string; description?: string; article?: boolean }
-const { title = profile.name, description = profile.bio, article = false } = Astro.props;
+const { title = profile.name, description = profile.bio.replace(/<[^>]+>/g, ''), article = false } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!doctype html>

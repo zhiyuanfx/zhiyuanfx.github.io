@@ -25,7 +25,7 @@ for (const item of [...research, ...projects, ...experience, ...publications]) {
         <figure class="portrait-frame"><Image src={portrait} alt="Portrait of Zhiyuan Jia" widths={[320, 480, 640, 960]} sizes="(max-width: 700px) 75vw, (max-width: 1100px) 32vw, 300px" width={600} height={800} loading="eager" fetchpriority="high" /></figure>
         <div class="intro">
           <h1 id="about-heading">Zhiyuan Jia<span class="brand-dot">.</span></h1>
-          <p class="bio">{profile.bio}</p>
+          <p class="bio" set:html={profile.bio} />
         </div>
         <aside class="contact-card" aria-label="Contact and résumé">
           <a href={`mailto:${profile.email}`}><ContactIcon kind="email"/><span class="contact-copy"><span>Email</span><span>{profile.email} ↗</span></span></a>
