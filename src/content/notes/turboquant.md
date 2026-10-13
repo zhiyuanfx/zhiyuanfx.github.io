@@ -12,7 +12,7 @@ Compressing a vector raises two different questions: how accurately can we recon
 
 These notes walk through the construction in [“TurboQuant: Online Vector Quantization with Near-optimal Distortion Rate”](https://arxiv.org/abs/2504.19874): an MSE-oriented quantizer, a one-bit Quantized Johnson–Lindenstrauss (QJL) estimator, their combination for inner products, and deployment in a KV cache.
 
-## Vector Quantization Motivation and Problem Definition
+## Vector quantization motivation and problem definition
 
 For a vector $x\in\mathbb{R}^d$, a quantizer with total budget $B=bd$ bits consists of an encoder and decoder
 
@@ -75,15 +75,15 @@ $$
 
 The expectations are taken over the random transformations used by the quantizer. We have two TurboQuant quantizers $Q_{\mathrm{mse}}$ and $Q_{\mathrm{prod}}$. $Q_{\mathrm{mse}}$ only minimizes $D_{\mathrm{mse}}$; $Q_{\mathrm{prod}}$ is an unbiased estimator for inner product and guarantees small $D_{\mathrm{prod}}$.
 
-## MSE-Optimized TurboQuant
+## MSE-optimized TurboQuant
 
 The first TurboQuant quantizer, denoted $Q_{\mathrm{mse}}$, only minimizes the MSE objective in Equation [(3)](#eq:mse-objective).
 
-### Why Direct Scalar Quantization Is Difficult
+### Why direct scalar quantization is difficult
 
 The coordinates of a practical vector can be uneven: a few coordinates may have large magnitudes while most are small. A single scalar grid must then either cover a wide range with coarse spacing or clip large values. TurboQuant first changes the coordinate system so that the energy of the vector is spread more evenly.
 
-### Step 1: Normalize onto the Unit Sphere
+### Step 1: normalize onto the unit sphere
 
 We assume
 
@@ -96,7 +96,7 @@ $$
 
 For a general nonzero vector $v$, the encoder may quantize $x=v/\|v\|_2$ and store the scalar norm $\|v\|_2$ separately. The norm is multiplied back into the decoded vector. This scalar metadata is not part of the $bd$ index bits and needs a marginally extra storage.
 
-### Step 2: Generate and Apply a Random Rotation
+### Step 2: generate and apply a random rotation
 
 TurboQuant generates an orthogonal matrix
 
@@ -118,7 +118,7 @@ $$
 
 For any fixed unit vector $x$, randomness in $\Pi$ makes $\Pi x$ uniformly distributed on the unit sphere. Consequently, every coordinate $y_j$ has the same marginal density as a Beta distribution. Distinct coordinates remain constrained by $\sum_j y_j^2=1$, so they are not exactly independent. In high dimensions, however, small collections of coordinates become nearly independent. As $d$ grows, the density of each $y_j$ approaches $\mathcal{N}(0,1/d)$.
 
-### Step 3: Construct a Codebook for $y$
+### Step 3: construct a codebook for $y$
 
 For bit width $b$, the scalar codebook contains $2^b$ ordered centroids. Nearest-centroid assignment is a one-dimensional $k$-means problem. Given the normal distribution of $y_j$, we can apply the Max–Lloyd algorithm, which directly gives us a near-optimal codebook.
 
@@ -144,7 +144,7 @@ $$
 
 The levels are nonuniform because the rotated-coordinate density is concentrated near zero.
 
-### Step 4: Encode by Rounding to Nearest Codeword
+### Step 4: encode by rounding to nearest codeword
 
 For each rotated coordinate $y_j$, the encoder stores
 
@@ -160,7 +160,7 @@ $$
 
 Each coordinate requires $b$ bits, so the compressed vector requires $bd$ bits as targeted.
 
-### Proof Message and Distortion Guarantee
+### Proof message and distortion guarantee
 
 $Q_{\mathrm{mse}}$ guarantees
 
@@ -175,13 +175,13 @@ $$
 
 Every additional bit reduces the asymptotic distortion by a factor of approximately four. $Q_{\mathrm{mse}}$ distortion is provably within a factor of at most $\frac{\sqrt{3}\,\pi}{2} \approx 2.7$ of the theoretical lower bound. By experiment, when $b=1$, $Q_{\mathrm{mse}}$ achieves $1.45$.
 
-### Practical Reuse and Entropy Coding
+### Practical reuse and entropy coding
 
 The codebook depends on the vector dimension and target bit width, $C=C(d,b)$. The shape of rotation $\Pi$ depend on $d$. Thus, both objects can be generated before inference, stored, and reused for every layers with the same vector dimension. No forward-pass data is needed.
 
 The codeword indices are not uniformly distributed because central codewords are selected more frequently. They can therefore be entropy-coded without changing reconstruction error. TurboQuant notes that the gain is modest—approximately a $5\%$ reduction of memory in the cited four-bit example—and omits it to preserve simplicity.
 
-## Why MSE Quantization Is Insufficient for Attention
+## Why MSE quantization is insufficient for attention
 
 Low MSE does not imply unbiased inner products. At one bit, $Q_{\mathrm{mse}}$ satisfies
 
@@ -196,11 +196,11 @@ $$
 
 Thus the one-bit MSE estimator systematically shrinks dot products by about $36\%$. The bias decreases as precision increases. TurboQuant therefore introduces a separate quantizer $Q_{\mathrm{prod}}$ whose primary goal is unbiased, low-variance inner-product estimation.
 
-## QJL: One-Bit Vector Quantization
+## QJL: one-bit vector quantization
 
 Quantized Johnson–Lindenstrauss (QJL) quantization represents a vector using signs of random projections. In TurboQuant it is used to encode a residual vector $r$, but it is useful to first view QJL as a standalone algorithm.
 
-### Step 1: Generate Random Projection Directions
+### Step 1: generate random projection directions
 
 Generate a random Gaussian matrix
 
@@ -213,7 +213,7 @@ $$
 
 Each row $s_i^\top$ defines a random direction and a random hyperplane through the origin.
 
-### Step 2: Store One Sign Bit per Projection
+### Step 2: store one sign bit per projection
 
 QJL encodes the residual as
 
@@ -232,7 +232,7 @@ $$
 $$
 
 
-### Step 3: Decode the Directional Average
+### Step 3: decode the directional average
 
 The residual estimate is
 
@@ -248,7 +248,7 @@ $$
 
 This expression is an average of random directions whose signs have been corrected using the target vector $r$.
 
-### Geometric Intuition
+### Geometric intuition
 
 Consider one Gaussian direction $s$ and a unit target direction $u=r/\|r\|_2$. Decompose
 
@@ -285,11 +285,11 @@ $$
 
 The inner-product variance decreases proportionally to $1/d$.
 
-## Inner-Product-Optimized TurboQuant
+## Inner-product-optimized TurboQuant
 
 TurboQuant combines $Q_{\mathrm{mse}}$ and $Q_{\mathrm{qjl}}$ into a $b$-bit inner-product quantizer $Q_{\mathrm{prod}}$. Most of the budget builds a low-MSE approximation, while the final bit per coordinate provides an unbiased residual correction.
 
-### Step 1: Spend b–1 Bits on MSE Quantization
+### Step 1: spend b–1 bits on MSE quantization
 
 Instantiate MSE TurboQuant at bit width $b-1$ and compute
 
@@ -302,7 +302,7 @@ $$
 
 This stage requires $(b-1)d$ index bits.
 
-### Step 2: Form the Exact Coarse Residual
+### Step 2: form the exact coarse residual
 
 Compute
 
@@ -315,7 +315,7 @@ $$
 
 The MSE stage is designed to make $\|r\|_2$ small.
 
-### Step 3: Spend One Bit on QJL
+### Step 3: spend one bit on QJL
 
 Encode the residual using
 
@@ -335,7 +335,7 @@ $$
 
 bits, plus the scalar residual norm.
 
-### Step 4: Decode and Add the Two Components
+### Step 4: decode and add the two components
 
 The final reconstruction is
 
@@ -352,7 +352,7 @@ $$
 
 At total bit width $b=1$, the coarse stage has zero bits and the construction reduces to QJL applied directly to $x$.
 
-### Proof Message and Distortion Guarantee
+### Proof message and distortion guarantee
 
 Conditioned on any coarse reconstruction, QJL returns the exact residual in expectation. $Q_{\mathrm{prod}}$ therefore guarantees
 
@@ -379,13 +379,13 @@ $$
 $$
 
 
-## KV-Cache Deployment
+## KV-cache deployment
 
-### Streaming Quantization
+### Streaming quantization
 
 A TurboQuant instance can be initialized before any forward pass because its codebook and random transforms do not require calibration data. A newly produced vector is encoded and stored immediately as compressed.
 
-### Outlier Channels and Mixed Precision
+### Outlier channels and mixed precision
 
 Practical KV caches can contain channels whose magnitudes remain unusually large across many prompt tokens, especially in deeper layers. These persistent channels contribute disproportionately to quantization error. For better results, TurboQuant paper handles outlier and normal channels by two independent quantizers with different precision. Each subvector has its own dimension, random transforms, and codebook.
 

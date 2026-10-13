@@ -1,5 +1,5 @@
 ---
-title: 'Better reasoning through sampling'
+title: 'Better Reasoning through Sampling'
 date: 2026-03-15
 keywords: ['Power Sampling', 'MCMC', 'LLM']
 ---
