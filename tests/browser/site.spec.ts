@@ -52,6 +52,17 @@ for (const width of [320, 375, 768, 919, 1440, 1920]) {
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     const displays = await page.locator('.katex-display').evaluateAll(nodes => nodes.map(n => getComputedStyle(n).overflowX));
     expect(displays.every(value => value === 'auto')).toBe(true);
+    await page.goto('/notes/awq/');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('AWQ: Activation-Aware Weight Quantization');
+    await expect(page.locator('.katex-error')).toHaveCount(0);
+    await expect(page.locator('.katex-display')).toHaveCount(19);
+    await expect(page.locator('.prose table')).toHaveCount(5);
+    await expect(page.locator('.awq-figure img')).toHaveCount(2);
+    for (const image of await page.locator('.awq-figure img').all()) {
+      await image.scrollIntoViewIfNeeded();
+      await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.goto('/notes/guided-llm-sampling/');
     await expect(page.locator('.prose table')).toHaveCount(6);
     await expect(page.locator('.katex-error')).toHaveCount(0);
@@ -80,14 +91,14 @@ for (const width of [320, 375, 768, 919, 1440, 1920]) {
 test('search, counts, literal input, sorting, and article return state', async ({ page }) => {
   await page.goto('/#notes');
   const search = page.getByRole('searchbox');
-  await expect(page.locator('.note-card')).toHaveCount(8);
+  await expect(page.locator('.note-card')).toHaveCount(9);
   await expect(page.locator('.note-card').first()).toContainText('Sep 16, 2026');
   await page.locator('#note-sort').click();
   await expect(page.locator('.note-card').first()).toContainText('Nov 1, 2023');
   await search.fill('better reasoning');
   await expect(page.locator('.note-card')).toHaveCount(1);
   await expect(page.locator('.match-count')).toContainText('occurrence');
-  await expect(page.locator('.note-excerpt')).toContainText('sampling');
+  await expect(page.locator('.note-excerpt')).toContainText(/sampling/i);
   await page.locator('.note-card h3 a').click();
   await expect(page).toHaveURL(/q=better\+reasoning&sort=asc/);
   await page.goBack();
@@ -105,7 +116,7 @@ test('search, counts, literal input, sorting, and article return state', async (
   await expect(page.locator('#note-empty')).toBeVisible();
   await expect(page.locator('#note-list img')).toHaveCount(0);
   await search.fill('   ');
-  await expect(page.locator('.note-card')).toHaveCount(8);
+  await expect(page.locator('.note-card')).toHaveCount(9);
 });
 test('desktop preview titles, descriptions, and arrows share baselines', async ({ page }) => {
   for (const width of [919, 1440]) {
@@ -140,7 +151,7 @@ test('articles and all notes remain readable without JavaScript', async ({ brows
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:4322/');
-  await expect(page.locator('.note-card')).toHaveCount(8);
+  await expect(page.locator('.note-card')).toHaveCount(9);
   await expect(page.locator('#primary-nav')).toBeVisible();
   await page.goto('http://127.0.0.1:4322/notes/turboquant/');
   await expect(page.locator('.katex-display')).toHaveCount(28);
@@ -161,7 +172,8 @@ test('linked research, project, experience, and publication cards share the corr
     ['.timeline-row:nth-child(1)', '/notes/guided-llm-sampling/'],
     ['.timeline-row:nth-child(2)', '/notes/llm-sparsity/'],
     ['.timeline-row:nth-child(3)', '/notes/quantum-hamiltonian-descent/'],
-    ['.publication', '/notes/quantum-hamiltonian-descent/'],
+    ['.publication:nth-of-type(1)', '/notes/llm-sparsity/'],
+    ['.publication:nth-of-type(2)', '/notes/quantum-hamiltonian-descent/'],
   ];
   for (const [selector, href] of expected) {
     await expect(page.locator(selector + ' .card-link')).toHaveAttribute('href', href);
@@ -171,7 +183,7 @@ test('linked research, project, experience, and publication cards share the corr
   await expect(page).toHaveURL(/\/notes\/llm-sparsity\//);
   await page.locator('.back-link').first().click();
   await expect(page).toHaveURL(/#research$/);
-  const arxiv = page.locator('.publication .tag-link');
+  const arxiv = page.locator('.publication:nth-of-type(2) .tag-link');
   await expect(arxiv).toHaveAttribute('href', 'https://arxiv.org/abs/2503.15878');
   await expect(arxiv).toHaveAttribute('target', '_blank');
   expect(await arxiv.evaluate(el => getComputedStyle(el).zIndex)).toBe('2');

@@ -254,5 +254,13 @@
 /* Fit QIPrune table backgrounds to their cells while retaining mobile scrolling. */
 .qiprune-prose table{width:fit-content;max-width:100%}
 
+.prose .awq-figure{margin:32px 0}
+.awq-figure img{width:100%;height:auto;background:white;border:1px solid var(--line);padding:10px}
+.awq-figure-narrow img{max-width:520px;margin-inline:auto}
+.awq-figure figcaption{margin-top:12px;font-size:.78rem;line-height:1.6;color:var(--muted)}
+.prose .awq-algorithm{margin:26px 0;background:#faf8f180;border:1px solid var(--line);font-size:.78rem;line-height:1.7;color:var(--ink)}
+.awq-prose table{width:fit-content;max-width:100%}
+.awq-prose .nowrap{white-space:nowrap}
+
 .publication-date{display:flex;flex-direction:column;gap:3px}
 .publication-date .publication-month,.publication-date .publication-year{font-family:var(--serif);font-size:1.5rem;font-weight:400;color:var(--olive);line-height:1.2}

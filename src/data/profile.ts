@@ -1,7 +1,7 @@
 export const sections = ['About', 'Research', 'Projects', 'Experience', 'Publications', 'Notes'];
 export const profile = {
   name: 'Zhiyuan Jia',
-  lastUpdated: '2026-09-29',
+  lastUpdated: '2026-10-13',
   email: 'zyj3@uw.edu',
   linkedin: 'https://www.linkedin.com/in/zhiyuan-jia-241533295',
   github: 'https://github.com/zhiyuanfx',
