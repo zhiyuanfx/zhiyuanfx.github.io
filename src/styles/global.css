@@ -262,5 +262,15 @@
 .awq-prose table{width:fit-content;max-width:100%}
 .awq-prose .nowrap{white-space:nowrap}
 
+/* Equation numbers: keep the equation centered and its number at the right edge, but place the number after a wide equation instead of over it when the equation scrolls. */
+.prose .katex-display>.katex>.katex-html:has(>.tag){display:flex;align-items:baseline}
+.prose .katex-display>.katex>.katex-html:has(>.tag)::before{content:'';flex:1 0 0}
+.prose .katex-display>.katex>.katex-html>.tag{position:static;flex:1 0 0;text-align:right;padding-left:1em}
+
+.prose .ipm-figure{margin:32px 0}
+.ipm-figure img{width:100%;max-width:560px;height:auto;margin-inline:auto;background:white;border:1px solid var(--line);padding:10px}
+.ipm-figure-tall img{max-width:460px}
+.ipm-figure figcaption{margin-top:12px;font-size:.78rem;line-height:1.6;color:var(--muted)}
+
 .publication-date{display:flex;flex-direction:column;gap:3px}
 .publication-date .publication-month,.publication-date .publication-year{font-family:var(--serif);font-size:1.5rem;font-weight:400;color:var(--olive);line-height:1.2}

@@ -63,6 +63,31 @@ for (const width of [320, 375, 768, 919, 1440, 1920]) {
       await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
     }
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.goto('/notes/interior-point-methods/');
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Interior-Point Methods for Linear Programming');
+    await expect(page.locator('.katex-error')).toHaveCount(0);
+    await expect(page.locator('.katex-display')).toHaveCount(18);
+    // The KaTeX stylesheet must match the renderer's version; otherwise its layout classes, such as .strut, are unstyled.
+    expect(await page.locator('.katex .strut').first().evaluate(n => getComputedStyle(n).display)).toBe('inline-block');
+    // Equation numbers sit at the right edge when the equation fits, and never cover a wide, scrolling equation.
+    const tags = await page.locator('.katex-display').evaluateAll(displays => displays.flatMap(d => {
+      const tag = d.querySelector('.tag');
+      if (!tag) return [];
+      const html = d.querySelector('.katex-html')!.getBoundingClientRect();
+      const t = tag.getBoundingClientRect();
+      const mathRight = Math.max(...[...d.querySelectorAll('.katex-html > .base')].map(b => b.getBoundingClientRect().right));
+      return [{ fits: d.scrollWidth <= d.clientWidth, overlap: mathRight - t.left, gap: html.right - t.right }];
+    }));
+    expect(tags).toHaveLength(15);
+    expect(tags.every(tag => tag.overlap <= 0.5)).toBe(true);
+    expect(tags.filter(tag => tag.fits).every(tag => Math.abs(tag.gap) <= 0.5)).toBe(true);
+    await expect(page.locator('.prose table')).toHaveCount(2);
+    await expect(page.locator('.ipm-figure img')).toHaveCount(3);
+    for (const image of await page.locator('.ipm-figure img').all()) {
+      await image.scrollIntoViewIfNeeded();
+      await expect.poll(() => image.evaluate(node => (node as HTMLImageElement).naturalWidth)).toBeGreaterThan(0);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
     await page.goto('/notes/guided-llm-sampling/');
     await expect(page.locator('.prose table')).toHaveCount(6);
     await expect(page.locator('.katex-error')).toHaveCount(0);
@@ -91,8 +116,8 @@ for (const width of [320, 375, 768, 919, 1440, 1920]) {
 test('search, counts, literal input, sorting, and article return state', async ({ page }) => {
   await page.goto('/#notes');
   const search = page.getByRole('searchbox');
-  await expect(page.locator('.note-card')).toHaveCount(9);
-  await expect(page.locator('.note-card').first()).toContainText('Sep 16, 2026');
+  await expect(page.locator('.note-card')).toHaveCount(10);
+  await expect(page.locator('.note-card').first()).toContainText('Nov 8, 2026');
   await page.locator('#note-sort').click();
   await expect(page.locator('.note-card').first()).toContainText('Nov 1, 2023');
   await search.fill('better reasoning');
@@ -116,7 +141,7 @@ test('search, counts, literal input, sorting, and article return state', async (
   await expect(page.locator('#note-empty')).toBeVisible();
   await expect(page.locator('#note-list img')).toHaveCount(0);
   await search.fill('   ');
-  await expect(page.locator('.note-card')).toHaveCount(9);
+  await expect(page.locator('.note-card')).toHaveCount(10);
 });
 test('desktop preview titles, descriptions, and arrows share baselines', async ({ page }) => {
   for (const width of [919, 1440]) {
@@ -151,7 +176,7 @@ test('articles and all notes remain readable without JavaScript', async ({ brows
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto('http://127.0.0.1:4322/');
-  await expect(page.locator('.note-card')).toHaveCount(9);
+  await expect(page.locator('.note-card')).toHaveCount(10);
   await expect(page.locator('#primary-nav')).toBeVisible();
   await page.goto('http://127.0.0.1:4322/notes/turboquant/');
   await expect(page.locator('.katex-display')).toHaveCount(28);
