@@ -215,7 +215,7 @@
 .prose .sampling-figure{margin:32px 0}
 .sampling-figure img{width:100%;background:white;border:1px solid var(--line);padding:10px}
 .sampling-figure figcaption{margin-top:12px;font-size:.78rem;line-height:1.6;color:var(--muted)}
-.prose table{max-width:100%;width:100%;font-size:.82rem;line-height:1.55;margin:26px 0;background:#faf8f180}
+.prose table{max-width:100%;width:fit-content;font-size:.82rem;line-height:1.55;margin:26px auto;background:#faf8f180}
 .prose th{background:#e9eadf;color:var(--ink);font-weight:600;white-space:nowrap}
 .prose td{font-variant-numeric:tabular-nums}
 .prose th,.prose td{padding:10px 13px}
@@ -251,15 +251,11 @@
 .qiprune-figure figcaption{font-size:.78rem;line-height:1.6;color:var(--muted);margin-top:12px}
 @media(max-width:600px){.qiprune-panels{grid-template-columns:1fr;gap:18px}}
 
-/* Fit QIPrune table backgrounds to their cells while retaining mobile scrolling. */
-.qiprune-prose table{width:fit-content;max-width:100%}
-
 .prose .awq-figure{margin:32px 0}
 .awq-figure img{width:100%;height:auto;background:white;border:1px solid var(--line);padding:10px}
 .awq-figure-narrow img{max-width:520px;margin-inline:auto}
 .awq-figure figcaption{margin-top:12px;font-size:.78rem;line-height:1.6;color:var(--muted)}
 .prose .awq-algorithm{margin:26px 0;background:#faf8f180;border:1px solid var(--line);font-size:.78rem;line-height:1.7;color:var(--ink)}
-.awq-prose table{width:fit-content;max-width:100%}
 .awq-prose .nowrap{white-space:nowrap}
 
 /* Equation numbers: keep the equation centered and its number at the right edge, but place the number after a wide equation instead of over it when the equation scrolls. */
@@ -271,6 +267,9 @@
 .ipm-figure img{width:100%;max-width:560px;height:auto;margin-inline:auto;background:white;border:1px solid var(--line);padding:10px}
 .ipm-figure-tall img{max-width:460px}
 .ipm-figure figcaption{margin-top:12px;font-size:.78rem;line-height:1.6;color:var(--muted)}
+.prose .mcc-figure{margin:32px 0}
+.mcc-figure img{width:100%;max-width:560px;height:auto;margin-inline:auto;background:white;border:1px solid var(--line);padding:10px}
+.mcc-figure figcaption{margin-top:12px;font-size:.78rem;line-height:1.6;color:var(--muted)}
 
 .publication-date{display:flex;flex-direction:column;gap:3px}
 .publication-date .publication-month,.publication-date .publication-year{font-family:var(--serif);font-size:1.5rem;font-weight:400;color:var(--olive);line-height:1.2}
